@@ -3,6 +3,13 @@ export interface Question {
   choices: string[];
 }
 
+export interface FileStructureItem {
+  type: 'file' | 'directory';
+  name: string;
+  description?: string;
+  children?: FileStructureItem[];
+}
+
 export interface QuestionRound {
   roundNumber: number;
   questions: Question[];
@@ -17,7 +24,7 @@ export interface Session {
   questionRounds: QuestionRound[];
   writeup?: string;
   fileStructure?: string;
-  fileStructureJson?: any;
+  fileStructureJson?: FileStructureItem;
   createdAt: Date;
   updatedAt: Date;
   config: SessionConfig;

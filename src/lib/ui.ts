@@ -9,7 +9,7 @@ export const ui = {
   warning: chalk.hex('#F59E0B'), // Amber
   error: chalk.hex('#EF4444'), // Red
   info: chalk.hex('#3B82F6'), // Blue
-  
+
   // Styled components
   logo: () => {
     console.log();
@@ -23,15 +23,14 @@ export const ui = {
   gradient: (text: string) => {
     // Create a gradient effect from indigo to purple
     const chars = text.split('');
-    const gradientSteps = [
-      '#6366F1', '#6D5FF0', '#7758EF', '#8251EE', 
-      '#8B4BED', '#8B5CF6'
-    ];
-    
-    return chars.map((char, i) => {
-      const colorIndex = Math.floor((i / chars.length) * gradientSteps.length);
-      return chalk.hex(gradientSteps[colorIndex])(char);
-    }).join('');
+    const gradientSteps = ['#6366F1', '#6D5FF0', '#7758EF', '#8251EE', '#8B4BED', '#8B5CF6'];
+
+    return chars
+      .map((char, i) => {
+        const colorIndex = Math.floor((i / chars.length) * gradientSteps.length);
+        return chalk.hex(gradientSteps[colorIndex])(char);
+      })
+      .join('');
   },
 
   header: (text: string) => {
@@ -61,13 +60,14 @@ export const ui = {
 
     console.log();
     console.log(ui.info('Progress:'));
-    
-    steps.forEach((s, index) => {
+
+    steps.forEach((s) => {
       const isActive = s.step === step;
-      const isPast = Object.values(SessionStep).indexOf(s.step) < Object.values(SessionStep).indexOf(step);
-      
+      const isPast =
+        Object.values(SessionStep).indexOf(s.step) < Object.values(SessionStep).indexOf(step);
+
       let line = '  ';
-      
+
       if (isActive) {
         line += ui.primary.bold(`${s.icon} ${s.label}`);
       } else if (isPast) {
@@ -75,7 +75,7 @@ export const ui = {
       } else {
         line += chalk.gray(`○ ${s.label}`);
       }
-      
+
       console.log(line);
     });
     console.log();
@@ -85,40 +85,46 @@ export const ui = {
     console.log(chalk.gray('─'.repeat(50)));
   },
 
-  success: (message: string) => {
+  successMsg: (message: string) => {
     console.log(ui.success(`✓ ${message}`));
   },
 
-  error: (message: string) => {
+  errorMsg: (message: string) => {
     console.log(ui.error(`✗ ${message}`));
   },
 
-  warning: (message: string) => {
+  warningMsg: (message: string) => {
     console.log(ui.warning(`⚠ ${message}`));
   },
 
-  info: (message: string) => {
+  infoMsg: (message: string) => {
     console.log(ui.info(`ℹ ${message}`));
   },
 
   box: (content: string[], title?: string) => {
-    const maxLength = Math.max(...content.map(line => line.length), title?.length || 0);
+    const maxLength = Math.max(...content.map((line) => line.length), title?.length || 0);
     const width = maxLength + 4;
-    
+
     console.log();
     console.log(chalk.gray('┌' + '─'.repeat(width) + '┐'));
-    
+
     if (title) {
       const padding = Math.floor((width - title.length) / 2);
-      console.log(chalk.gray('│ ') + ' '.repeat(padding - 1) + ui.primary.bold(title) + ' '.repeat(width - padding - title.length - 1) + chalk.gray(' │'));
+      console.log(
+        chalk.gray('│ ') +
+          ' '.repeat(padding - 1) +
+          ui.primary.bold(title) +
+          ' '.repeat(width - padding - title.length - 1) +
+          chalk.gray(' │')
+      );
       console.log(chalk.gray('├' + '─'.repeat(width) + '┤'));
     }
-    
-    content.forEach(line => {
+
+    content.forEach((line) => {
       const paddedLine = line + ' '.repeat(width - line.length - 2);
       console.log(chalk.gray('│ ') + paddedLine + chalk.gray(' │'));
     });
-    
+
     console.log(chalk.gray('└' + '─'.repeat(width) + '┘'));
     console.log();
   },

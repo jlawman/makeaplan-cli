@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getApiKey } from './config.js';
-import { Question } from '../types/index.js';
+import { Question, FileStructureItem } from '../types/index.js';
 import ora from 'ora';
 import chalk from 'chalk';
 
@@ -16,7 +16,7 @@ export class AIClient {
 
   async initialize(): Promise<void> {
     const apiKey = await getApiKey(this.provider);
-    
+
     if (this.provider === 'anthropic') {
       this.anthropic = new Anthropic({ apiKey });
     } else {
@@ -25,7 +25,7 @@ export class AIClient {
   }
 
   async generateQuestions(
-    idea: string, 
+    idea: string,
     round: number,
     previousQA?: Array<{ question: string; answer: string }>,
     config?: {
@@ -38,9 +38,9 @@ export class AIClient {
     try {
       const prompt = this.buildQuestionsPrompt(idea, round, previousQA, config);
       const response = await this.sendPrompt(prompt);
-      
+
       spinner.succeed('Questions generated');
-      
+
       return this.parseQuestions(response);
     } catch (error) {
       spinner.fail('Failed to generate questions');
@@ -58,9 +58,9 @@ export class AIClient {
     try {
       const prompt = this.buildWriteupPrompt(idea, allQuestions, allAnswers);
       const response = await this.sendPrompt(prompt);
-      
+
       spinner.succeed('Technical specification generated');
-      
+
       return this.extractWriteup(response);
     } catch (error) {
       spinner.fail('Failed to generate writeup');
@@ -74,9 +74,9 @@ export class AIClient {
     try {
       const prompt = this.buildFileStructurePrompt(writeup);
       const response = await this.sendPrompt(prompt);
-      
+
       spinner.succeed('File structure generated');
-      
+
       return this.extractFileStructure(response);
     } catch (error) {
       spinner.fail('Failed to generate file structure');
@@ -84,15 +84,15 @@ export class AIClient {
     }
   }
 
-  async convertToJson(fileStructure: string): Promise<any> {
+  async convertToJson(fileStructure: string): Promise<FileStructureItem> {
     const spinner = ora('Converting to JSON...').start();
 
     try {
       const prompt = this.buildJsonConversionPrompt(fileStructure);
       const response = await this.sendPrompt(prompt);
-      
+
       spinner.succeed('JSON structure generated');
-      
+
       return this.extractJson(response);
     } catch (error) {
       spinner.fail('Failed to convert to JSON');
@@ -107,7 +107,7 @@ export class AIClient {
         max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }],
       });
-      
+
       return response.content[0].type === 'text' ? response.content[0].text : '';
     } else if (this.provider === 'gemini' && this.gemini) {
       const model = this.gemini.getGenerativeModel({ model: 'gemini-pro' });
@@ -115,12 +115,12 @@ export class AIClient {
       const response = await result.response;
       return response.text();
     }
-    
+
     throw new Error('AI client not initialized');
   }
 
   private buildQuestionsPrompt(
-    idea: string, 
+    idea: string,
     round: number,
     previousQA?: Array<{ question: string; answer: string }>,
     config?: { questionsCount: number; answersPerQuestion: number }
@@ -129,7 +129,7 @@ export class AIClient {
     const answersPerQuestion = config?.answersPerQuestion || 4;
 
     let prompt = `You are an expert product designer and software architect helping to refine and develop product ideas.\n\n`;
-    
+
     if (round === 1) {
       prompt += `I have a product idea: "${idea}".\n\n`;
       prompt += `Please ask me ${questionsCount} multiple choice questions to better understand my requirements, target audience, and key features.\n`;
@@ -140,7 +140,7 @@ export class AIClient {
         prompt += `Q${index + 1}: ${qa.question}\n`;
         prompt += `A${index + 1}: ${qa.answer}\n\n`;
       });
-      
+
       if (round === 2) {
         prompt += `Based on the previous answers, ask ${questionsCount} follow-up questions focusing on user experience, user stories, and product differentiation.\n`;
       } else if (round === 3) {
@@ -224,7 +224,8 @@ Wrap the JSON in <json> tags.`;
 
   private parseQuestions(response: string): Question[] {
     const questions: Question[] = [];
-    const questionRegex = /<question>[\s\S]*?<text>([\s\S]*?)<\/text>[\s\S]*?<choices>([\s\S]*?)<\/choices>[\s\S]*?<\/question>/g;
+    const questionRegex =
+      /<question>[\s\S]*?<text>([\s\S]*?)<\/text>[\s\S]*?<choices>([\s\S]*?)<\/choices>[\s\S]*?<\/question>/g;
     const choiceRegex = /<choice>([\s\S]*?)<\/choice>/g;
 
     let match;
@@ -232,12 +233,12 @@ Wrap the JSON in <json> tags.`;
       const questionText = match[1].trim();
       const choicesText = match[2];
       const choices: string[] = [];
-      
+
       let choiceMatch;
       while ((choiceMatch = choiceRegex.exec(choicesText)) !== null) {
         choices.push(choiceMatch[1].trim());
       }
-      
+
       questions.push({ question: questionText, choices });
     }
 
@@ -254,10 +255,10 @@ Wrap the JSON in <json> tags.`;
     return match ? match[1].trim() : response;
   }
 
-  private extractJson(response: string): any {
+  private extractJson(response: string): FileStructureItem {
     const match = response.match(/<json>([\s\S]*?)<\/json>/);
     const jsonStr = match ? match[1].trim() : response;
-    
+
     try {
       return JSON.parse(jsonStr);
     } catch (error) {

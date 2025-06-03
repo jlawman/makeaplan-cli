@@ -41,7 +41,7 @@ export class SessionManager {
   async saveSession(session: Session): Promise<void> {
     session.updatedAt = new Date();
     const sessionPath = join(this.sessionsDir, `${session.id}.json`);
-    
+
     try {
       await fs.writeFile(sessionPath, JSON.stringify(session, null, 2));
     } catch (error) {
@@ -52,27 +52,29 @@ export class SessionManager {
 
   async loadSession(sessionId: string): Promise<Session | null> {
     const sessionPath = join(this.sessionsDir, `${sessionId}.json`);
-    
+
     try {
       const data = await fs.readFile(sessionPath, 'utf-8');
       const session = JSON.parse(data) as Session;
-      
+
       // Convert date strings back to Date objects
       session.createdAt = new Date(session.createdAt);
       session.updatedAt = new Date(session.updatedAt);
-      session.questionRounds.forEach(round => {
+      session.questionRounds.forEach((round) => {
         round.timestamp = new Date(round.timestamp);
       });
-      
+
       return session;
     } catch (error) {
       return null;
     }
   }
 
-  async listSessions(): Promise<Array<{ id: string; idea: string; updatedAt: Date; step: SessionStep }>> {
+  async listSessions(): Promise<
+    Array<{ id: string; idea: string; updatedAt: Date; step: SessionStep }>
+  > {
     await this.ensureSessionsDir();
-    
+
     try {
       const files = await fs.readdir(this.sessionsDir);
       const sessions = [];
@@ -81,7 +83,7 @@ export class SessionManager {
         if (file.endsWith('.json')) {
           const sessionId = file.replace('.json', '');
           const session = await this.loadSession(sessionId);
-          
+
           if (session) {
             sessions.push({
               id: session.id,
@@ -95,7 +97,7 @@ export class SessionManager {
 
       // Sort by most recent first
       sessions.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
-      
+
       return sessions;
     } catch (error) {
       console.error(chalk.red('Failed to list sessions'));
@@ -105,7 +107,7 @@ export class SessionManager {
 
   async deleteSession(sessionId: string): Promise<boolean> {
     const sessionPath = join(this.sessionsDir, `${sessionId}.json`);
-    
+
     try {
       await fs.unlink(sessionPath);
       return true;
@@ -118,7 +120,7 @@ export class SessionManager {
     const sessions = await this.listSessions();
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
-    
+
     let deletedCount = 0;
 
     for (const session of sessions) {

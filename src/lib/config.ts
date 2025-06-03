@@ -18,27 +18,31 @@ export const config = new Conf<Config>({
 
 export async function getApiKey(provider: 'anthropic' | 'gemini'): Promise<string> {
   // Check environment variables first
-  const envKey = provider === 'anthropic' 
-    ? process.env.ANTHROPIC_API_KEY 
-    : process.env.GEMINI_API_KEY;
-  
+  const envKey =
+    provider === 'anthropic' ? process.env.ANTHROPIC_API_KEY : process.env.GEMINI_API_KEY;
+
   if (envKey) {
     return envKey;
   }
 
   // Check stored config
-  const storedKey = provider === 'anthropic' 
-    ? config.get('anthropicApiKey')
-    : config.get('geminiApiKey');
-  
+  const storedKey =
+    provider === 'anthropic' ? config.get('anthropicApiKey') : config.get('geminiApiKey');
+
   if (storedKey) {
     return storedKey;
   }
 
   // Ask user for API key
-  console.log(chalk.yellow(`\n${provider.charAt(0).toUpperCase() + provider.slice(1)} API key not found.`));
+  console.log(
+    chalk.yellow(`\n${provider.charAt(0).toUpperCase() + provider.slice(1)} API key not found.`)
+  );
   console.log(chalk.gray(`You can set it as an environment variable or enter it now.`));
-  console.log(chalk.gray(`Environment variable: ${provider === 'anthropic' ? 'ANTHROPIC_API_KEY' : 'GEMINI_API_KEY'}\n`));
+  console.log(
+    chalk.gray(
+      `Environment variable: ${provider === 'anthropic' ? 'ANTHROPIC_API_KEY' : 'GEMINI_API_KEY'}\n`
+    )
+  );
 
   const { apiKey, saveKey } = await inquirer.prompt([
     {

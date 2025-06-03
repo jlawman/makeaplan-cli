@@ -10,28 +10,28 @@ export async function resumeCommand() {
     const sessions = await sessionManager.listSessions();
 
     if (sessions.length === 0) {
-      ui.warning('No sessions found. Starting a new session...');
+      ui.warningMsg('No sessions found. Starting a new session...');
       return newCommand({});
     }
 
     ui.header('Resume Session');
-    
+
     const sessionId = await selectSession(sessions);
-    
+
     if (!sessionId) {
       // User selected "Back"
       return;
     }
 
     const session = await sessionManager.loadSession(sessionId);
-    
+
     if (!session) {
-      ui.error('Failed to load session');
+      ui.errorMsg('Failed to load session');
       return;
     }
 
-    ui.success(`Resuming session: ${session.idea.substring(0, 50)}...`);
-    
+    ui.successMsg(`Resuming session: ${session.idea.substring(0, 50)}...`);
+
     // Initialize AI client with session's provider
     const aiClient = new AIClient(session.config.provider);
     await aiClient.initialize();
@@ -39,9 +39,10 @@ export async function resumeCommand() {
     // Continue workflow from where it left off
     const { runWorkflow } = await import('./new.js');
     await runWorkflow(session, aiClient, sessionManager);
-
   } catch (error) {
-    ui.error(`Failed to resume session: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    ui.errorMsg(
+      `Failed to resume session: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
     process.exit(1);
   }
 }

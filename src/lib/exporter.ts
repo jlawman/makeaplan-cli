@@ -14,7 +14,10 @@ export class Exporter {
 
   async exportSession(session: Session, format: 'markdown' | 'json' | 'both'): Promise<string[]> {
     const exportedFiles: string[] = [];
-    const baseFileName = `${session.idea.substring(0, 30).replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${session.id.substring(0, 8)}`;
+    const baseFileName = `${session.idea
+      .substring(0, 30)
+      .replace(/[^a-z0-9]/gi, '-')
+      .toLowerCase()}-${session.id.substring(0, 8)}`;
 
     if (format === 'markdown' || format === 'both') {
       const mdPath = await this.exportMarkdown(session, baseFileName);
@@ -31,14 +34,14 @@ export class Exporter {
 
   private async exportMarkdown(session: Session, baseFileName: string): Promise<string> {
     const spinner = ora('Exporting markdown...').start();
-    
+
     try {
       const content = this.generateMarkdown(session);
       const filePath = join(this.outputDir, `${baseFileName}.md`);
-      
+
       await fs.writeFile(filePath, content);
       spinner.succeed(`Exported to ${chalk.green(filePath)}`);
-      
+
       return filePath;
     } catch (error) {
       spinner.fail('Failed to export markdown');
@@ -48,10 +51,10 @@ export class Exporter {
 
   private async exportJson(session: Session, baseFileName: string): Promise<string> {
     const spinner = ora('Exporting JSON...').start();
-    
+
     try {
       const filePath = join(this.outputDir, `${baseFileName}.json`);
-      
+
       const exportData = {
         metadata: {
           id: session.id,
@@ -67,10 +70,10 @@ export class Exporter {
           fileStructureJson: session.fileStructureJson,
         },
       };
-      
+
       await fs.writeFile(filePath, JSON.stringify(exportData, null, 2));
       spinner.succeed(`Exported to ${chalk.green(filePath)}`);
-      
+
       return filePath;
     } catch (error) {
       spinner.fail('Failed to export JSON');
@@ -81,7 +84,7 @@ export class Exporter {
   private generateMarkdown(session: Session): string {
     let md = `# ${session.idea}\n\n`;
     md += `> Generated on ${session.createdAt.toLocaleDateString()} using MakeAPlan CLI\n\n`;
-    
+
     // Table of Contents
     md += `## Table of Contents\n\n`;
     md += `1. [Product Idea](#product-idea)\n`;
@@ -93,18 +96,18 @@ export class Exporter {
       md += `4. [File Structure](#file-structure)\n`;
     }
     md += `\n---\n\n`;
-    
+
     // Product Idea
     md += `## Product Idea\n\n`;
     md += `${session.idea}\n\n`;
-    
+
     // Discovery Process
     md += `## Discovery Process\n\n`;
     md += `The following questions were asked to better understand the requirements:\n\n`;
-    
-    session.questionRounds.forEach((round, roundIndex) => {
+
+    session.questionRounds.forEach((round) => {
       md += `### Round ${round.roundNumber}\n\n`;
-      
+
       round.questions.forEach((question, qIndex) => {
         const answer = round.answers[qIndex];
         if (answer) {
@@ -113,13 +116,13 @@ export class Exporter {
         }
       });
     });
-    
+
     // Technical Specification
     if (session.writeup) {
       md += `---\n\n## Technical Specification\n\n`;
       md += `${session.writeup}\n\n`;
     }
-    
+
     // File Structure
     if (session.fileStructure) {
       md += `---\n\n## File Structure\n\n`;
@@ -127,14 +130,14 @@ export class Exporter {
       md += `${session.fileStructure}\n`;
       md += '```\n\n';
     }
-    
+
     // Configuration
     md += `---\n\n## Configuration\n\n`;
     md += `- **AI Provider**: ${session.config.provider}\n`;
     md += `- **First Round Questions**: ${session.config.firstRoundQuestions}\n`;
     md += `- **Subsequent Round Questions**: ${session.config.subsequentRoundQuestions}\n`;
     md += `- **Answers Per Question**: ${session.config.answersPerQuestion}\n`;
-    
+
     return md;
   }
 }

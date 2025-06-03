@@ -8,18 +8,24 @@ export async function configCommand(action?: string) {
     if (!action) {
       // Show current configuration
       ui.header('Configuration');
-      
+
       ui.keyValue('Default Provider', config.get('defaultProvider'));
       ui.keyValue('Sessions Directory', config.get('sessionsDir'));
       ui.keyValue('Output Directory', config.get('outputDir'));
-      ui.keyValue('Anthropic API Key', config.get('anthropicApiKey') ? '***' + config.get('anthropicApiKey')!.slice(-4) : 'Not set');
-      ui.keyValue('Gemini API Key', config.get('geminiApiKey') ? '***' + config.get('geminiApiKey')!.slice(-4) : 'Not set');
-      
+      ui.keyValue(
+        'Anthropic API Key',
+        config.get('anthropicApiKey') ? '***' + config.get('anthropicApiKey')!.slice(-4) : 'Not set'
+      );
+      ui.keyValue(
+        'Gemini API Key',
+        config.get('geminiApiKey') ? '***' + config.get('geminiApiKey')!.slice(-4) : 'Not set'
+      );
+
       console.log();
       console.log(chalk.gray('Commands:'));
       console.log(chalk.gray('  makeaplan config reset    - Reset all settings'));
       console.log(chalk.gray('  makeaplan config keys     - Manage API keys'));
-      
+
       return;
     }
 
@@ -27,18 +33,17 @@ export async function configCommand(action?: string) {
       case 'reset':
         await resetConfig();
         break;
-        
+
       case 'keys':
         await manageKeys();
         break;
-        
+
       default:
-        ui.error(`Unknown config action: ${action}`);
+        ui.errorMsg(`Unknown config action: ${action}`);
         console.log(chalk.gray('Use: makeaplan config [reset|keys]'));
     }
-    
   } catch (error) {
-    ui.error(`Configuration error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    ui.errorMsg(`Configuration error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     process.exit(1);
   }
 }
@@ -54,12 +59,12 @@ async function resetConfig() {
   ]);
 
   if (!confirm) {
-    ui.info('Reset cancelled.');
+    ui.infoMsg('Reset cancelled.');
     return;
   }
 
   config.clear();
-  ui.success('Configuration reset to defaults.');
+  ui.successMsg('Configuration reset to defaults.');
 }
 
 async function manageKeys() {
@@ -81,12 +86,12 @@ async function manageKeys() {
     case 'clear':
       clearApiKeys();
       break;
-      
+
     case 'anthropic':
     case 'gemini':
       await updateApiKey(action);
       break;
-      
+
     case 'back':
       return;
   }
@@ -108,5 +113,5 @@ async function updateApiKey(provider: 'anthropic' | 'gemini') {
     config.set('geminiApiKey', apiKey);
   }
 
-  ui.success(`${provider} API key updated.`);
+  ui.successMsg(`${provider} API key updated.`);
 }

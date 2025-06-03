@@ -21,7 +21,9 @@ program
   .name('makeaplan')
   .description('AI-powered product specification generator')
   .version(packageJson.version)
-  .addHelpText('after', `
+  .addHelpText(
+    'after',
+    `
 Examples:
   $ makeaplan new                    Start a new product specification
   $ makeaplan new -i "My idea"       Start with a predefined idea
@@ -30,7 +32,8 @@ Examples:
   $ makeaplan export abc123          Export a specific session
   $ makeaplan config                 View configuration
 
-For more information, visit: https://github.com/yourusername/makeaplan-cli`);
+For more information, visit: https://github.com/yourusername/makeaplan-cli`
+  );
 
 // New command
 program
@@ -41,17 +44,10 @@ program
   .action(newCommand);
 
 // Resume command
-program
-  .command('resume')
-  .description('Resume a previous session')
-  .action(resumeCommand);
+program.command('resume').description('Resume a previous session').action(resumeCommand);
 
 // List command
-program
-  .command('list')
-  .alias('ls')
-  .description('List all sessions')
-  .action(listCommand);
+program.command('list').alias('ls').description('List all sessions').action(listCommand);
 
 // Export command
 program
@@ -75,55 +71,54 @@ program
   .action(configCommand);
 
 // Default action (show interactive menu)
-program
-  .action(async () => {
-    ui.welcome();
-    
-    const inquirer = (await import('inquirer')).default;
-    const { action } = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'action',
-        message: 'What would you like to do?',
-        choices: [
-          { name: '🚀 Start a new product specification', value: 'new' },
-          { name: '📂 Resume a previous session', value: 'resume' },
-          { name: '📋 List all sessions', value: 'list' },
-          { name: '⚙️  Configuration', value: 'config' },
-          new inquirer.Separator(),
-          { name: '❌ Exit', value: 'exit' },
-        ],
-      },
-    ]);
+program.action(async () => {
+  ui.welcome();
 
-    switch (action) {
-      case 'new':
-        await newCommand({});
-        break;
-      case 'resume':
-        await resumeCommand();
-        break;
-      case 'list':
-        await listCommand();
-        break;
-      case 'config':
-        await configCommand();
-        break;
-      case 'exit':
-        ui.goodbye();
-        break;
-    }
-  });
+  const inquirer = (await import('inquirer')).default;
+  const { action } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'action',
+      message: 'What would you like to do?',
+      choices: [
+        { name: '🚀 Start a new product specification', value: 'new' },
+        { name: '📂 Resume a previous session', value: 'resume' },
+        { name: '📋 List all sessions', value: 'list' },
+        { name: '⚙️  Configuration', value: 'config' },
+        new inquirer.Separator(),
+        { name: '❌ Exit', value: 'exit' },
+      ],
+    },
+  ]);
+
+  switch (action) {
+    case 'new':
+      await newCommand({});
+      break;
+    case 'resume':
+      await resumeCommand();
+      break;
+    case 'list':
+      await listCommand();
+      break;
+    case 'config':
+      await configCommand();
+      break;
+    case 'exit':
+      ui.goodbye();
+      break;
+  }
+});
 
 // Error handling
 process.on('unhandledRejection', (error) => {
-  ui.error(`Unexpected error: ${error}`);
+  ui.errorMsg(`Unexpected error: ${error}`);
   process.exit(1);
 });
 
 process.on('SIGINT', () => {
   console.log();
-  ui.warning('Interrupted. Session saved.');
+  ui.warningMsg('Interrupted. Session saved.');
   process.exit(0);
 });
 

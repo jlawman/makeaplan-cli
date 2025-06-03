@@ -11,39 +11,48 @@ export async function listCommand() {
     ui.header('Your Sessions');
 
     if (sessions.length === 0) {
-      ui.info('No sessions found. Start a new session with: makeaplan new');
+      ui.infoMsg('No sessions found. Start a new session with: makeaplan new');
       return;
     }
 
-    const sessionList = sessions.map(session => {
+    const sessionList = sessions.map((session) => {
       const stepLabel = getStepLabel(session.step);
       const stepColor = getStepColor(session.step);
-      
+
       return [
         chalk.gray(session.id.substring(0, 8)),
         session.idea,
         stepColor(stepLabel),
-        chalk.gray(formatDate(session.updatedAt))
+        chalk.gray(formatDate(session.updatedAt)),
       ];
     });
 
     // Create table
     console.log();
-    console.log(chalk.gray('  ID        Idea                                      Status              Updated'));
-    console.log(chalk.gray('  ────────  ────────────────────────────────────────  ──────────────────  ─────────'));
-    
-    sessionList.forEach(row => {
+    console.log(
+      chalk.gray(
+        '  ID        Idea                                      Status              Updated'
+      )
+    );
+    console.log(
+      chalk.gray(
+        '  ────────  ────────────────────────────────────────  ──────────────────  ─────────'
+      )
+    );
+
+    sessionList.forEach((row) => {
       console.log(`  ${row[0]}  ${padEnd(row[1], 40)}  ${padEnd(row[2], 18)}  ${row[3]}`);
     });
-    
+
     console.log();
-    ui.info(`Total sessions: ${sessions.length}`);
+    ui.infoMsg(`Total sessions: ${sessions.length}`);
     console.log();
     console.log(chalk.gray('Resume a session with: makeaplan resume'));
     console.log(chalk.gray('Export a session with: makeaplan export <session-id>'));
-    
   } catch (error) {
-    ui.error(`Failed to list sessions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    ui.errorMsg(
+      `Failed to list sessions: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
     process.exit(1);
   }
 }
@@ -84,7 +93,7 @@ function formatDate(date: Date): string {
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  
+
   if (days === 0) {
     const hours = Math.floor(diff / (1000 * 60 * 60));
     if (hours === 0) {

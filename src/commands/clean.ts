@@ -8,7 +8,7 @@ export async function cleanCommand(options: { days?: string; force?: boolean }) 
     const daysToKeep = options.days ? parseInt(options.days) : 30;
 
     if (isNaN(daysToKeep) || daysToKeep < 0) {
-      ui.error('Invalid days value. Must be a positive number.');
+      ui.errorMsg('Invalid days value. Must be a positive number.');
       return;
     }
 
@@ -19,18 +19,18 @@ export async function cleanCommand(options: { days?: string; force?: boolean }) 
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-    const sessionsToDelete = sessions.filter(session => session.updatedAt < cutoffDate);
+    const sessionsToDelete = sessions.filter((session) => session.updatedAt < cutoffDate);
 
     if (sessionsToDelete.length === 0) {
-      ui.info(`No sessions older than ${daysToKeep} days found.`);
+      ui.infoMsg(`No sessions older than ${daysToKeep} days found.`);
       return;
     }
 
     console.log();
-    ui.warning(`Found ${sessionsToDelete.length} sessions older than ${daysToKeep} days:`);
+    ui.warningMsg(`Found ${sessionsToDelete.length} sessions older than ${daysToKeep} days:`);
     console.log();
 
-    sessionsToDelete.forEach(session => {
+    sessionsToDelete.forEach((session) => {
       console.log(`  • ${session.idea} (${formatAge(session.updatedAt)})`);
     });
 
@@ -52,17 +52,18 @@ export async function cleanCommand(options: { days?: string; force?: boolean }) 
     }
 
     if (!confirm) {
-      ui.info('Cleanup cancelled.');
+      ui.infoMsg('Cleanup cancelled.');
       return;
     }
 
     // Delete sessions
     const deletedCount = await sessionManager.cleanOldSessions(daysToKeep);
-    
-    ui.success(`Deleted ${deletedCount} old sessions.`);
 
+    ui.successMsg(`Deleted ${deletedCount} old sessions.`);
   } catch (error) {
-    ui.error(`Failed to clean sessions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    ui.errorMsg(
+      `Failed to clean sessions: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
     process.exit(1);
   }
 }
@@ -71,7 +72,7 @@ function formatAge(date: Date): string {
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  
+
   if (days === 0) {
     return 'today';
   } else if (days === 1) {

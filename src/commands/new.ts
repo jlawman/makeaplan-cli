@@ -2,7 +2,13 @@ import { Session, SessionStep, QuestionRound } from '../types/index.js';
 import { AIClient } from '../lib/ai-client.js';
 import { SessionManager } from '../lib/session-manager.js';
 import { Exporter } from '../lib/exporter.js';
-import { askForIdea, askQuestions, confirmContinue, selectExportFormat, askSessionConfig } from '../lib/interactive.js';
+import {
+  askForIdea,
+  askQuestions,
+  confirmContinue,
+  selectExportFormat,
+  askSessionConfig,
+} from '../lib/interactive.js';
 import { ui } from '../lib/ui.js';
 import chalk from 'chalk';
 
@@ -11,42 +17,48 @@ export async function newCommand(options: { idea?: string; skipQuestions?: boole
     ui.welcome();
 
     // Get idea
-    const idea = options.idea || await askForIdea();
-    
+    const idea = options.idea || (await askForIdea());
+
     // Get session configuration
     ui.subheader('Configuration');
-    const sessionConfig = options.skipQuestions 
-      ? { firstRoundQuestions: 5, subsequentRoundQuestions: 5, answersPerQuestion: 4, provider: 'anthropic' as const }
+    const sessionConfig = options.skipQuestions
+      ? {
+          firstRoundQuestions: 5,
+          subsequentRoundQuestions: 5,
+          answersPerQuestion: 4,
+          provider: 'anthropic' as const,
+        }
       : await askSessionConfig();
 
     // Create session
     const sessionManager = new SessionManager();
     const session = await sessionManager.createSession(idea, sessionConfig);
-    
-    ui.success(`Session created: ${chalk.gray(session.id.substring(0, 8))}`);
-    
+
+    ui.successMsg(`Session created: ${chalk.gray(session.id.substring(0, 8))}`);
+
     // Initialize AI client
     const aiClient = new AIClient(sessionConfig.provider);
     await aiClient.initialize();
 
     // Start the workflow
     await runWorkflow(session, aiClient, sessionManager);
-
   } catch (error) {
-    ui.error(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    ui.errorMsg(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     process.exit(1);
   }
 }
 
 export async function runWorkflow(
-  session: Session, 
-  aiClient: AIClient, 
+  session: Session,
+  aiClient: AIClient,
   sessionManager: SessionManager
 ): Promise<void> {
-  
-  let currentSession = session;
+  const currentSession = session;
 
-  while (currentSession.currentStep !== SessionStep.CONVERT_TO_JSON) {
+  // Continue until workflow is complete
+  let workflowComplete = false;
+
+  while (!workflowComplete) {
     ui.step(currentSession.currentStep);
 
     switch (currentSession.currentStep) {
@@ -58,30 +70,35 @@ export async function runWorkflow(
 
       case SessionStep.QUESTIONS_ROUND_1:
       case SessionStep.QUESTIONS_ROUND_2:
-      case SessionStep.QUESTIONS_ROUND_3:
-        const roundNumber = currentSession.currentStep === SessionStep.QUESTIONS_ROUND_1 ? 1 :
-                           currentSession.currentStep === SessionStep.QUESTIONS_ROUND_2 ? 2 : 3;
-        
+      case SessionStep.QUESTIONS_ROUND_3: {
+        const roundNumber =
+          currentSession.currentStep === SessionStep.QUESTIONS_ROUND_1
+            ? 1
+            : currentSession.currentStep === SessionStep.QUESTIONS_ROUND_2
+              ? 2
+              : 3;
+
         // Get previous Q&A for context
-        const previousQA = currentSession.questionRounds.flatMap(round => 
+        const previousQA = currentSession.questionRounds.flatMap((round) =>
           round.questions.map((q, i) => ({
             question: q.question,
-            answer: round.answers[i] || ''
+            answer: round.answers[i] || '',
           }))
         );
 
         // Generate questions
-        const questionsCount = roundNumber === 1 
-          ? currentSession.config.firstRoundQuestions 
-          : currentSession.config.subsequentRoundQuestions;
+        const questionsCount =
+          roundNumber === 1
+            ? currentSession.config.firstRoundQuestions
+            : currentSession.config.subsequentRoundQuestions;
 
         const questions = await aiClient.generateQuestions(
-          currentSession.idea, 
+          currentSession.idea,
           roundNumber,
           previousQA,
           {
             questionsCount,
-            answersPerQuestion: currentSession.config.answersPerQuestion
+            answersPerQuestion: currentSession.config.answersPerQuestion,
           }
         );
 
@@ -93,7 +110,7 @@ export async function runWorkflow(
           roundNumber,
           questions,
           answers,
-          timestamp: new Date()
+          timestamp: new Date(),
         };
         currentSession.questionRounds.push(round);
 
@@ -107,19 +124,20 @@ export async function runWorkflow(
         }
 
         await sessionManager.saveSession(currentSession);
-        
-        if (!await confirmContinue()) {
-          ui.info('Session saved. You can resume later with: makeaplan resume');
+
+        if (!(await confirmContinue())) {
+          ui.infoMsg('Session saved. You can resume later with: makeaplan resume');
           return;
         }
         break;
+      }
 
-      case SessionStep.FINAL_WRITEUP:
+      case SessionStep.FINAL_WRITEUP: {
         // Generate writeup
-        const allQuestions = currentSession.questionRounds.flatMap(round => 
-          round.questions.map(q => q.question)
+        const allQuestions = currentSession.questionRounds.flatMap((round) =>
+          round.questions.map((q) => q.question)
         );
-        const allAnswers = currentSession.questionRounds.flatMap(round => round.answers);
+        const allAnswers = currentSession.questionRounds.flatMap((round) => round.answers);
 
         currentSession.writeup = await aiClient.generateWriteup(
           currentSession.idea,
@@ -130,48 +148,54 @@ export async function runWorkflow(
         currentSession.currentStep = SessionStep.GENERATE_FILE_STRUCTURE;
         await sessionManager.saveSession(currentSession);
 
-        ui.box([
-          'Technical specification generated!',
-          `Length: ${currentSession.writeup.length} characters`,
-          `Sections: ${(currentSession.writeup.match(/^#{1,3} /gm) || []).length}`
-        ], 'Specification Complete');
+        ui.box(
+          [
+            'Technical specification generated!',
+            `Length: ${currentSession.writeup.length} characters`,
+            `Sections: ${(currentSession.writeup.match(/^#{1,3} /gm) || []).length}`,
+          ],
+          'Specification Complete'
+        );
 
-        if (!await confirmContinue('Generate file structure?')) {
+        if (!(await confirmContinue('Generate file structure?'))) {
           await exportAndExit(currentSession);
           return;
         }
         break;
+      }
 
-      case SessionStep.GENERATE_FILE_STRUCTURE:
+      case SessionStep.GENERATE_FILE_STRUCTURE: {
         if (!currentSession.writeup) {
           throw new Error('No writeup found');
         }
 
         currentSession.fileStructure = await aiClient.generateFileStructure(currentSession.writeup);
-        currentSession.currentStep = SessionStep.CONVERT_TO_JSON;
-        await sessionManager.saveSession(currentSession);
 
-        ui.box([
-          'File structure generated!',
-          `Files/Dirs: ${(currentSession.fileStructure.match(/[│├└]/g) || []).length}`,
-        ], 'File Structure Complete');
+        ui.box(
+          [
+            'File structure generated!',
+            `Files/Dirs: ${(currentSession.fileStructure.match(/[│├└]/g) || []).length}`,
+          ],
+          'File Structure Complete'
+        );
 
-        if (!await confirmContinue('Convert to JSON format?')) {
+        if (!(await confirmContinue('Convert to JSON format?'))) {
+          await sessionManager.saveSession(currentSession);
           await exportAndExit(currentSession);
           return;
         }
-        break;
 
-      case SessionStep.CONVERT_TO_JSON:
-        if (!currentSession.fileStructure) {
-          throw new Error('No file structure found');
-        }
-
-        currentSession.fileStructureJson = await aiClient.convertToJson(currentSession.fileStructure);
+        // Convert to JSON
+        currentSession.fileStructureJson = await aiClient.convertToJson(
+          currentSession.fileStructure
+        );
+        currentSession.currentStep = SessionStep.CONVERT_TO_JSON;
         await sessionManager.saveSession(currentSession);
 
-        ui.success('Workflow complete! 🎉');
+        ui.successMsg('Workflow complete! 🎉');
+        workflowComplete = true;
         break;
+      }
     }
   }
 
@@ -186,13 +210,16 @@ async function exportAndExit(session: Session): Promise<void> {
   const exporter = new Exporter();
   const exportedFiles = await exporter.exportSession(session, format);
 
-  ui.box([
-    'Your product specification is ready!',
-    '',
-    ...exportedFiles.map(file => `📄 ${file}`),
-    '',
-    `Session ID: ${session.id.substring(0, 8)}`,
-  ], 'Export Complete');
+  ui.box(
+    [
+      'Your product specification is ready!',
+      '',
+      ...exportedFiles.map((file) => `📄 ${file}`),
+      '',
+      `Session ID: ${session.id.substring(0, 8)}`,
+    ],
+    'Export Complete'
+  );
 
   ui.goodbye();
 }
