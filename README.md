@@ -12,6 +12,7 @@ Transform your product ideas into comprehensive technical specifications using A
 
 - **AI-Powered Discovery**: Leverages Claude or Gemini AI to ask targeted questions about your product idea
 - **Structured Workflow**: Three rounds of increasingly specific questions to refine your vision
+- **Quick Number Selection**: Press 1-9 to instantly select answers, 0 for custom input, 's' to skip
 - **Technical Specifications**: Generates comprehensive documentation including architecture, features, and implementation details
 - **File Structure Generation**: Creates an optimal project structure with all necessary files and directories
 - **Session Management**: Save and resume sessions, never lose your progress

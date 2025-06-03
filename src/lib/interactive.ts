@@ -17,31 +17,39 @@ export async function askForIdea(): Promise<string> {
 
 export async function askQuestions(questions: Question[], round: number): Promise<string[]> {
   console.log(chalk.cyan(`\n📝 Round ${round} Questions\n`));
+  console.log(chalk.gray('💡 Tip: Type the number (1-9) to quickly select an option\n'));
 
   const answers: string[] = [];
 
   for (let i = 0; i < questions.length; i++) {
     const question = questions[i];
 
-    // Add custom answer and skip options
+    // Add numbered choices
+    const numberedChoices = question.choices.map((choice, index) => ({
+      name: `${index + 1}. ${choice}`,
+      value: choice,
+      short: choice,
+    }));
+
     const choices: any[] = [
-      ...question.choices,
+      ...numberedChoices,
       new inquirer.Separator(),
-      '✏️  Write your own answer',
-      '⏭️  Skip this question',
+      { name: '0. ✏️  Write your own answer', value: 'custom', short: 'Custom' },
+      { name: 's. ⏭️  Skip this question', value: 'skip', short: 'Skipped' },
     ];
 
+    // Use rawlist type which supports number key navigation
     const { answer } = await inquirer.prompt([
       {
-        type: 'list',
+        type: 'rawlist',
         name: 'answer',
-        message: `${i + 1}. ${question.question}`,
+        message: `${question.question}`,
         choices,
-        pageSize: 10,
+        pageSize: 12,
       },
     ]);
 
-    if (answer === '✏️  Write your own answer') {
+    if (answer === 'custom') {
       const { customAnswer } = await inquirer.prompt([
         {
           type: 'input',
@@ -51,7 +59,7 @@ export async function askQuestions(questions: Question[], round: number): Promis
         },
       ]);
       answers.push(customAnswer.trim());
-    } else if (answer === '⏭️  Skip this question') {
+    } else if (answer === 'skip') {
       answers.push('');
     } else {
       answers.push(answer);

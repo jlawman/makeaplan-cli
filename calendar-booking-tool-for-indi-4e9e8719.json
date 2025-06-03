@@ -1,0 +1,541 @@
+{
+  "metadata": {
+    "id": "4e9e8719-6923-43fc-a26a-1d7cc7250a28",
+    "createdAt": "2025-06-03T16:04:21.688Z",
+    "updatedAt": "2025-06-03T16:10:25.127Z",
+    "config": {
+      "firstRoundQuestions": 5,
+      "subsequentRoundQuestions": 4,
+      "answersPerQuestion": 4,
+      "provider": "anthropic"
+    }
+  },
+  "idea": "Calendar booking tool for indie co-working spaces that allows members to reserve desks, meeting rooms, and event spaces with flexible pricing and community features",
+  "questionRounds": [
+    {
+      "roundNumber": 1,
+      "questions": [
+        {
+          "question": "What is the primary type of co-working space you're targeting?",
+          "choices": [
+            "Small independent spaces (1-50 desks)",
+            "Medium-sized networks (2-5 locations, 50-200 desks)",
+            "Large multi-city operators (5+ locations)",
+            "Converted cafes/retail spaces with flexible working areas"
+          ]
+        },
+        {
+          "question": "Which pricing model would best suit your target users?",
+          "choices": [
+            "Pay-per-use with hourly/daily rates",
+            "Monthly membership with included credits",
+            "Tiered subscription with different access levels",
+            "Hybrid model combining memberships and pay-per-use"
+          ]
+        },
+        {
+          "question": "What is the most important community feature for your platform?",
+          "choices": [
+            "Member profiles and direct messaging",
+            "Event organization and attendance",
+            "Skills directory and member matching",
+            "Community bulletin board and announcements"
+          ]
+        },
+        {
+          "question": "How should the booking system handle recurring reservations?",
+          "choices": [
+            "No recurring bookings, single reservations only",
+            "Weekly/monthly recurring options with flexible modification",
+            "Package deals for bulk advance bookings",
+            "AI-powered smart scheduling based on usage patterns"
+          ]
+        },
+        {
+          "question": "What type of integration is most critical for your platform?",
+          "choices": [
+            "Payment processing (Stripe, PayPal)",
+            "Calendar systems (Google, Outlook)",
+            "Access control/security systems",
+            "Accounting software (Quickbooks, Xero)"
+          ]
+        }
+      ],
+      "answers": [
+        "Small independent spaces (1-50 desks)",
+        "Hybrid model combining memberships and pay-per-use",
+        "Event organization and attendance",
+        "Weekly/monthly recurring options with flexible modification",
+        "Payment processing (Stripe, PayPal)"
+      ],
+      "timestamp": "2025-06-03T16:05:59.157Z"
+    },
+    {
+      "roundNumber": 2,
+      "questions": [
+        {
+          "question": "Which user onboarding flow would provide the most value for small independent spaces?",
+          "choices": [
+            "Guided setup wizard with space layout customization",
+            "Template-based quick start with pre-configured settings",
+            "Video tutorials and interactive walkthrough",
+            "1-on-1 consultation with customer success team"
+          ]
+        },
+        {
+          "question": "What key differentiator would most appeal to independent space owners compared to enterprise solutions?",
+          "choices": [
+            "Simplified pricing structure with no long-term contracts",
+            "Customizable branding and white-label options",
+            "Built-in marketing tools for community growth",
+            "Direct integration with social media platforms"
+          ]
+        },
+        {
+          "question": "Which member-focused feature would drive the most engagement in small co-working communities?",
+          "choices": [
+            "Member directory with skill sharing capabilities",
+            "In-app messaging and collaboration tools",
+            "Community bulletin board for announcements",
+            "Loyalty program with booking rewards"
+          ]
+        },
+        {
+          "question": "What booking interface would best serve both regular members and occasional users?",
+          "choices": [
+            "Calendar view with drag-and-drop functionality",
+            "Mobile-first app with QR code check-in",
+            "Interactive floor plan with real-time availability",
+            "List view with smart filtering options"
+          ]
+        }
+      ],
+      "answers": [
+        "Guided setup wizard with space layout customization",
+        "Customizable branding and white-label options",
+        "Member directory with skill sharing capabilities",
+        "Interactive floor plan with real-time availability"
+      ],
+      "timestamp": "2025-06-03T16:07:24.151Z"
+    },
+    {
+      "roundNumber": 3,
+      "questions": [
+        {
+          "question": "Given the interactive floor plan and real-time availability requirements, which architecture pattern would be most appropriate for handling live updates?",
+          "choices": [
+            "WebSocket-based pub/sub with Redis backend",
+            "Long polling with cached state management",
+            "Server-Sent Events with event sourcing",
+            "GraphQL subscriptions with MongoDB change streams"
+          ]
+        },
+        {
+          "question": "What technical approach would best support the white-label customization while maintaining scalable deployment?",
+          "choices": [
+            "Multi-tenant architecture with dynamic CSS injection",
+            "Separate instances per customer with shared core codebase",
+            "Template-based configuration with static builds",
+            "Microservices with tenant-specific frontends"
+          ]
+        },
+        {
+          "question": "Considering the payment integration and recurring booking requirements, which data persistence strategy would be most efficient?",
+          "choices": [
+            "Event sourcing with CQRS pattern",
+            "Traditional RDBMS with materialized views",
+            "Document store with denormalized booking data",
+            "Hybrid storage with hot/cold data separation"
+          ]
+        },
+        {
+          "question": "For the member directory and skill sharing feature, which API architecture would provide the best balance of performance and flexibility?",
+          "choices": [
+            "REST API with GraphQL federation for complex queries",
+            "Pure GraphQL with dataloaders and caching",
+            "Micro-frontends with BFF (Backend For Frontend) pattern",
+            "REST API with CQRS for read operations"
+          ]
+        }
+      ],
+      "answers": [
+        "WebSocket-based pub/sub with Redis backend",
+        "Multi-tenant architecture with dynamic CSS injection",
+        "Traditional RDBMS with materialized views",
+        "Pure GraphQL with dataloaders and caching"
+      ],
+      "timestamp": "2025-06-03T16:08:47.624Z"
+    }
+  ],
+  "outputs": {
+    "writeup": "# Technical Specification: CoWorkFlow - Booking Platform for Independent Co-working Spaces\n\n## 1. Executive Summary\nCoWorkFlow is a comprehensive booking and community management platform designed specifically for independent co-working spaces. The system combines real-time space management, flexible pricing, and community features through a modern web application built on a scalable, multi-tenant architecture.\n\n## 2. Product Overview and Goals\n### Primary Goals\n- Simplify space booking and management for independent co-working spaces\n- Enable flexible pricing and membership models\n- Foster community engagement through integrated features\n- Provide white-label customization options\n- Deliver real-time availability updates and interactive booking\n\n### Success Metrics\n- Booking completion rate > 95%\n- System uptime > 99.9%\n- Average page load time < 2s\n- Payment processing success rate > 99.5%\n\n## 3. Target Audience and User Personas\n### Space Owners\n- Independent co-working space operators\n- Managing 1-50 desk capacity\n- Requiring customizable branding\n- Seeking community-building tools\n\n### Members\n- Regular workspace users\n- Flexible desk requirements\n- Interest in community participation\n- Various technical proficiency levels\n\n## 4. Core Features and Functionality\n\n### Booking System\n- Interactive floor plan visualization\n- Real-time availability updates\n- Recurring booking management\n- Flexible pricing rules engine\n\n### Community Features\n- Member directory\n- Skill sharing marketplace\n- Event management\n- Community announcements\n\n### Administration\n- Space layout customization\n- Membership management\n- White-label branding controls\n- Analytics dashboard\n\n## 5. Technical Architecture\n\n### Frontend\n```\nTechnology Stack:\n- React with TypeScript\n- Next.js for SSR\n- TailwindCSS with CSS Modules\n- Redux Toolkit for state management\n\nKey Components:\n- Dynamic floor plan renderer\n- Real-time booking interface\n- White-label theming system\n```\n\n### Backend\n```\nTechnology Stack:\n- Node.js with TypeScript\n- Express.js\n- GraphQL (Apollo Server)\n- WebSocket server for real-time updates\n\nServices:\n- Authentication service\n- Booking engine\n- Payment processor\n- Notification service\n```\n\n### Infrastructure\n```\n- AWS ECS for containerized deployment\n- Redis for caching and pub/sub\n- PostgreSQL for primary data storage\n- S3 for asset storage\n- CloudFront for CDN\n```\n\n## 6. Data Models and Database Design\n\n### Core Entities\n```sql\nCREATE TABLE spaces (\n    id UUID PRIMARY KEY,\n    tenant_id UUID,\n    name VARCHAR(255),\n    layout_config JSONB,\n    branding_config JSONB\n);\n\nCREATE TABLE bookings (\n    id UUID PRIMARY KEY,\n    space_id UUID,\n    user_id UUID,\n    resource_id UUID,\n    start_time TIMESTAMP,\n    end_time TIMESTAMP,\n    recurring_config JSONB,\n    payment_status VARCHAR(50)\n);\n\nCREATE TABLE members (\n    id UUID PRIMARY KEY,\n    space_id UUID,\n    profile_data JSONB,\n    membership_type VARCHAR(50),\n    skills TEXT[]\n);\n```\n\n## 7. API Design and Integrations\n\n### GraphQL Schema Excerpt\n```graphql\ntype Space {\n    id: ID!\n    name: String!\n    resources: [Resource!]!\n    availability: AvailabilityMap!\n    members: [Member!]!\n}\n\ntype Booking {\n    id: ID!\n    resource: Resource!\n    timeSlot: TimeSlot!\n    user: User!\n    recurringConfig: RecurringConfig\n}\n```\n\n### External Integrations\n- Stripe for payment processing\n- SendGrid for email notifications\n- Google Calendar for calendar sync\n- Slack for community notifications\n\n## 8. Security Considerations\n\n### Authentication & Authorization\n- JWT-based authentication\n- Role-based access control\n- Tenant isolation\n- Rate limiting\n\n### Data Protection\n- End-to-end encryption for sensitive data\n- GDPR compliance\n- Regular security audits\n- Automated backup system\n\n## 9. Performance Requirements\n\n### Metrics\n- API response time < 200ms\n- WebSocket latency < 100ms\n- Maximum concurrent users per space: 500\n- Database query performance < 100ms\n\n### Optimization Strategies\n- Redis caching layer\n- GraphQL query optimization\n- Asset CDN distribution\n- Database indexing strategy\n\n## 10. Development Roadmap and Milestones\n\n### Phase 1 (Months 1-2)\n- Core booking engine\n- Basic floor plan visualization\n- Authentication system\n- Payment integration\n\n### Phase 2 (Months 3-4)\n- Member directory\n- Community features\n- White-label customization\n- Analytics dashboard\n\n### Phase 3 (Months 5-6)\n- Advanced reporting\n- Mobile applications\n- API marketplace\n- Integration ecosystem\n\n### Phase 4 (Months 7-8)\n- AI-powered recommendations\n- Advanced analytics\n- Enterprise features\n- Scale optimization",
+    "fileStructure": "```\ncoworkflow/\n├── .github/                      # GitHub Actions and workflows\n│   └── workflows/\n│       ├── ci.yml\n│       └── deploy.yml\n├── .husky/                       # Git hooks for code quality\n├── docker/                       # Docker configuration files\n│   ├── dev/\n│   └── prod/\n├── packages/                     # Monorepo packages\n│   ├── common/                   # Shared utilities and types\n│   │   ├── src/\n│   │   │   ├── types/\n│   │   │   ├── constants/\n│   │   │   └── utils/\n│   │   └── package.json\n│   ├── web/                     # Frontend application\n│   │   ├── public/\n│   │   ├── src/\n│   │   │   ├── components/\n│   │   │   │   ├── booking/\n│   │   │   │   ├── community/\n│   │   │   │   ├── floorplan/\n│   │   │   │   └── shared/\n│   │   │   ├── features/\n│   │   │   │   ├── authentication/\n│   │   │   │   ├── booking/\n│   │   │   │   ├── community/\n│   │   │   │   └── admin/\n│   │   │   ├── hooks/\n│   │   │   ├── layouts/\n│   │   │   ├── pages/\n│   │   │   ├── services/\n│   │   │   ├── store/\n│   │   │   ├── styles/\n│   │   │   └── utils/\n│   │   └── package.json\n│   └── api/                     # Backend application\n│       ├── src/\n│       │   ├── config/\n│       │   ├── controllers/\n│       │   ├── graphql/\n│       │   │   ├── resolvers/\n│       │   │   ├── schemas/\n│       │   │   └── directives/\n│       │   ├── middleware/\n│       │   ├── models/\n│       │   ├── services/\n│       │   │   ├── auth/\n│       │   │   ├── booking/\n│       │   │   ├── notification/\n│       │   │   └── payment/\n│       │   ├── utils/\n│       │   └── websocket/\n│       └── package.json\n├── infrastructure/              # Infrastructure as code\n│   ├── terraform/\n│   │   ├── modules/\n│   │   └── environments/\n│   └── scripts/\n├── docs/                       # Documentation\n│   ├── api/\n│   ├── architecture/\n│   └── guides/\n├── scripts/                    # Development and deployment scripts\n├── tests/                      # Integration and E2E tests\n│   ├── integration/\n│   └── e2e/\n├── .dockerignore\n├── .env.example\n├── .eslintrc.js\n├── .gitignore\n├── .prettierrc\n├── docker-compose.yml\n├── jest.config.js\n├── lerna.json                  # Monorepo management\n├── package.json\n├── README.md\n└── tsconfig.json\n\nKey Dependencies:\n- Frontend:\n  - React, Next.js, TypeScript\n  - TailwindCSS, CSS Modules\n  - Redux Toolkit\n  - Apollo Client\n  - Socket.io-client\n\n- Backend:\n  - Node.js, Express\n  - TypeScript\n  - Apollo Server\n  - PostgreSQL (pg)\n  - Redis\n  - TypeORM\n  - Socket.io\n\n- Development:\n  - Lerna\n  - ESLint\n  - Prettier\n  - Jest\n  - Docker\n  - Husky\n```",
+    "fileStructureJson": {
+      "type": "directory",
+      "name": "coworkflow",
+      "description": "Root project directory",
+      "children": [
+        {
+          "type": "directory",
+          "name": ".github",
+          "description": "GitHub Actions and workflows",
+          "children": [
+            {
+              "type": "directory",
+              "name": "workflows",
+              "children": [
+                {
+                  "type": "file",
+                  "name": "ci.yml"
+                },
+                {
+                  "type": "file",
+                  "name": "deploy.yml"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": ".husky",
+          "description": "Git hooks for code quality"
+        },
+        {
+          "type": "directory",
+          "name": "docker",
+          "description": "Docker configuration files",
+          "children": [
+            {
+              "type": "directory",
+              "name": "dev"
+            },
+            {
+              "type": "directory",
+              "name": "prod"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "packages",
+          "description": "Monorepo packages",
+          "children": [
+            {
+              "type": "directory",
+              "name": "common",
+              "description": "Shared utilities and types",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "src",
+                  "children": [
+                    {
+                      "type": "directory",
+                      "name": "types"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "constants"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "utils"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "package.json"
+                }
+              ]
+            },
+            {
+              "type": "directory",
+              "name": "web",
+              "description": "Frontend application",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "public"
+                },
+                {
+                  "type": "directory",
+                  "name": "src",
+                  "children": [
+                    {
+                      "type": "directory",
+                      "name": "components",
+                      "children": [
+                        {
+                          "type": "directory",
+                          "name": "booking"
+                        },
+                        {
+                          "type": "directory",
+                          "name": "community"
+                        },
+                        {
+                          "type": "directory",
+                          "name": "floorplan"
+                        },
+                        {
+                          "type": "directory",
+                          "name": "shared"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "features",
+                      "children": [
+                        {
+                          "type": "directory",
+                          "name": "authentication"
+                        },
+                        {
+                          "type": "directory",
+                          "name": "booking"
+                        },
+                        {
+                          "type": "directory",
+                          "name": "community"
+                        },
+                        {
+                          "type": "directory",
+                          "name": "admin"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "hooks"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "layouts"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "pages"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "services"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "store"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "styles"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "utils"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "package.json"
+                }
+              ]
+            },
+            {
+              "type": "directory",
+              "name": "api",
+              "description": "Backend application",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "src",
+                  "children": [
+                    {
+                      "type": "directory",
+                      "name": "config"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "controllers"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "graphql",
+                      "children": [
+                        {
+                          "type": "directory",
+                          "name": "resolvers"
+                        },
+                        {
+                          "type": "directory",
+                          "name": "schemas"
+                        },
+                        {
+                          "type": "directory",
+                          "name": "directives"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "middleware"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "models"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "services",
+                      "children": [
+                        {
+                          "type": "directory",
+                          "name": "auth"
+                        },
+                        {
+                          "type": "directory",
+                          "name": "booking"
+                        },
+                        {
+                          "type": "directory",
+                          "name": "notification"
+                        },
+                        {
+                          "type": "directory",
+                          "name": "payment"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "utils"
+                    },
+                    {
+                      "type": "directory",
+                      "name": "websocket"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "package.json"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "infrastructure",
+          "description": "Infrastructure as code",
+          "children": [
+            {
+              "type": "directory",
+              "name": "terraform",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "modules"
+                },
+                {
+                  "type": "directory",
+                  "name": "environments"
+                }
+              ]
+            },
+            {
+              "type": "directory",
+              "name": "scripts"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "docs",
+          "description": "Documentation",
+          "children": [
+            {
+              "type": "directory",
+              "name": "api"
+            },
+            {
+              "type": "directory",
+              "name": "architecture"
+            },
+            {
+              "type": "directory",
+              "name": "guides"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "scripts",
+          "description": "Development and deployment scripts"
+        },
+        {
+          "type": "directory",
+          "name": "tests",
+          "description": "Integration and E2E tests",
+          "children": [
+            {
+              "type": "directory",
+              "name": "integration"
+            },
+            {
+              "type": "directory",
+              "name": "e2e"
+            }
+          ]
+        },
+        {
+          "type": "file",
+          "name": ".dockerignore"
+        },
+        {
+          "type": "file",
+          "name": ".env.example"
+        },
+        {
+          "type": "file",
+          "name": ".eslintrc.js"
+        },
+        {
+          "type": "file",
+          "name": ".gitignore"
+        },
+        {
+          "type": "file",
+          "name": ".prettierrc"
+        },
+        {
+          "type": "file",
+          "name": "docker-compose.yml"
+        },
+        {
+          "type": "file",
+          "name": "jest.config.js"
+        },
+        {
+          "type": "file",
+          "name": "lerna.json",
+          "description": "Monorepo management"
+        },
+        {
+          "type": "file",
+          "name": "package.json"
+        },
+        {
+          "type": "file",
+          "name": "README.md"
+        },
+        {
+          "type": "file",
+          "name": "tsconfig.json"
+        }
+      ]
+    }
+  }
+}
