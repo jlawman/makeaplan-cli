@@ -1,0 +1,35 @@
+# Source files
+src/
+tsconfig.json
+
+# Development files
+.gitignore
+.npmignore
+.env*
+.makeaplan/
+
+# IDE
+.vscode/
+.idea/
+
+# Documentation source
+docs/
+
+# Testing
+test/
+coverage/
+.nyc_output/
+
+# Examples
+examples/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Keep only necessary files
+!dist/
+!README.md
+!LICENSE
+!package.json
