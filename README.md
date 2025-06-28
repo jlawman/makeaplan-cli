@@ -161,4 +161,4 @@ MIT License - see LICENSE file for details.
 
 ---
 
-<p align="center">Made with ❤️ by developers, for developers</p>
+<p align="center">Made with Claude Code for Claude Code</p>
