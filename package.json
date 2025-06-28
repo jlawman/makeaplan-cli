@@ -27,6 +27,17 @@
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jlawman/makeaplan-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jlawman/makeaplan-cli/issues"
+  },
+  "homepage": "https://github.com/jlawman/makeaplan-cli#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.2",
     "@google/generative-ai": "^0.24.0",
