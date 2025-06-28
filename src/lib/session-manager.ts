@@ -25,7 +25,7 @@ export class SessionManager {
     await this.ensureSessionsDir();
 
     const session: Session = {
-      id: uuidv4(),
+      id: uuidv4().substring(0, 8),
       idea,
       currentStep: SessionStep.INITIAL_IDEA,
       questionRounds: [],

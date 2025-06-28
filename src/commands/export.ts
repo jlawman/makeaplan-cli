@@ -35,7 +35,7 @@ export async function exportCommand(sessionId: string, options: { format?: strin
     }
 
     ui.header('Export Session');
-    ui.keyValue('Session ID', session.id.substring(0, 8));
+    ui.keyValue('Session ID', session.id);
     ui.keyValue('Idea', session.idea.substring(0, 50) + '...');
     ui.keyValue('Created', session.createdAt.toLocaleDateString());
     console.log();

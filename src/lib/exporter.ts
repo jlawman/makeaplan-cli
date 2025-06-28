@@ -15,7 +15,7 @@ export class Exporter {
     const baseFileName = `${session.idea
       .substring(0, 30)
       .replace(/[^a-z0-9]/gi, '-')
-      .toLowerCase()}-${session.id.substring(0, 8)}`;
+      .toLowerCase()}-${session.id}`;
 
     if (format === 'markdown' || format === 'both') {
       const mdPath = await this.exportMarkdown(session, baseFileName);
