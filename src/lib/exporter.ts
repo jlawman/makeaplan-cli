@@ -1,15 +1,13 @@
 import { Session } from '../types/index.js';
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { config } from './config.js';
 import chalk from 'chalk';
 import ora from 'ora';
 
 export class Exporter {
-  private outputDir: string;
-
-  constructor() {
-    this.outputDir = config.get('outputDir');
+  private getOutputDir(): string {
+    // Always use current working directory instead of stored config
+    return process.cwd();
   }
 
   async exportSession(session: Session, format: 'markdown' | 'json' | 'both'): Promise<string[]> {
@@ -37,7 +35,7 @@ export class Exporter {
 
     try {
       const content = this.generateMarkdown(session);
-      const filePath = join(this.outputDir, `${baseFileName}.md`);
+      const filePath = join(this.getOutputDir(), `${baseFileName}.md`);
 
       await fs.writeFile(filePath, content);
       spinner.succeed(`Exported to ${chalk.green(filePath)}`);
@@ -53,7 +51,7 @@ export class Exporter {
     const spinner = ora('Exporting JSON...').start();
 
     try {
-      const filePath = join(this.outputDir, `${baseFileName}.json`);
+      const filePath = join(this.getOutputDir(), `${baseFileName}.json`);
 
       const exportData = {
         metadata: {

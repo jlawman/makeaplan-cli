@@ -11,7 +11,7 @@ export async function configCommand(action?: string) {
 
       ui.keyValue('Default Provider', config.get('defaultProvider'));
       ui.keyValue('Sessions Directory', config.get('sessionsDir'));
-      ui.keyValue('Output Directory', config.get('outputDir'));
+      ui.keyValue('Output Directory', 'Current working directory');
       ui.keyValue(
         'Anthropic API Key',
         config.get('anthropicApiKey') ? '***' + config.get('anthropicApiKey')!.slice(-4) : 'Not set'
