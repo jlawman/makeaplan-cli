@@ -1,6 +1,6 @@
 {
   "name": "makeaplan",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "AI-powered product specification generator CLI",
   "main": "dist/index.js",
   "bin": {

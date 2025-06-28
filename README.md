@@ -159,15 +159,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 MIT License - see LICENSE file for details.
 
-## 🙏 Acknowledgments
-
-Built with:
-- [Commander.js](https://github.com/tj/commander.js/) - CLI framework
-- [Inquirer.js](https://github.com/SBoudrias/Inquirer.js/) - Interactive prompts
-- [Chalk](https://github.com/chalk/chalk) - Terminal styling
-- [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-typescript) - Claude AI
-- [Google Generative AI](https://github.com/google/generative-ai-js) - Gemini AI
-
 ---
 
 <p align="center">Made with ❤️ by developers, for developers</p>
