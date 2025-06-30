@@ -104,7 +104,7 @@ export class AIClient {
     if (this.provider === 'anthropic' && this.anthropic) {
       // Using Anthropic's Sonnet 4 model
       const response = await this.anthropic.messages.create({
-        model: 'claude-4-sonnet',
+        model: 'claude-sonnet-4',
         max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }],
       });
