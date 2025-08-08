@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 import { program } from 'commander';
-import { newCommand } from './commands/new.js';
-import { resumeCommand } from './commands/resume.js';
-import { listCommand } from './commands/list.js';
-import { exportCommand } from './commands/export.js';
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { cleanCommand } from './commands/clean.js';
 import { configCommand } from './commands/config.js';
+import { exportCommand } from './commands/export.js';
+import { listCommand } from './commands/list.js';
+import { newCommand } from './commands/new.js';
+import { resumeCommand } from './commands/resume.js';
 import { ui } from './lib/ui.js';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 
 // Get package.json for version
 const __filename = fileURLToPath(import.meta.url);
@@ -32,7 +32,7 @@ Examples:
   $ makeaplan export abc123          Export a specific session
   $ makeaplan config                 View configuration
 
-For more information, visit: https://github.com/yourusername/makeaplan-cli`
+For more information, visit: https://github.com/jlawman/makeaplan-cli`
   );
 
 // New command
