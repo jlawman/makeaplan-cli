@@ -1,9 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getApiKey } from './config.js';
-import { Question, FileStructureItem } from '../types/index.js';
+import { Question } from '../types/index.js';
 import ora from 'ora';
-import chalk from 'chalk';
 
 export class AIClient {
   private anthropic?: Anthropic;
@@ -92,21 +91,6 @@ export class AIClient {
     }
   }
 
-  async convertToJson(fileStructure: string): Promise<FileStructureItem> {
-    const spinner = ora('Converting to JSON...').start();
-
-    try {
-      const prompt = this.buildJsonConversionPrompt(fileStructure);
-      const response = await this.sendPrompt(prompt);
-
-      spinner.succeed('JSON structure generated');
-
-      return this.extractJson(response);
-    } catch (error) {
-      spinner.fail('Failed to convert to JSON');
-      throw error;
-    }
-  }
 
   private async sendPrompt(prompt: string): Promise<string> {
     if (this.provider === 'anthropic' && this.anthropic) {
@@ -218,19 +202,6 @@ Format the output as a tree structure with descriptions for important files/dire
 Wrap your response in <filestructure> tags.`;
   }
 
-  private buildJsonConversionPrompt(fileStructure: string): string {
-    return `Convert this file structure to a JSON format:
-
-${fileStructure}
-
-Create a JSON structure where each item has:
-- type: "file" or "directory"
-- name: the file/directory name
-- description: (optional) description of the file/directory
-- children: (for directories) array of child items
-
-Wrap the JSON in <json> tags.`;
-  }
 
   private parseQuestions(response: string): Question[] {
     const questions: Question[] = [];
@@ -265,29 +236,4 @@ Wrap the JSON in <json> tags.`;
     return match ? match[1].trim() : response;
   }
 
-  private extractJson(response: string): FileStructureItem {
-    const match = response.match(/<json>([\s\S]*?)<\/json>/);
-    let jsonStr = match ? match[1].trim() : response.trim();
-    
-    // Remove any potential HTML tags or markdown code blocks that might be left
-    jsonStr = jsonStr.replace(/^```json\s*/i, '').replace(/\s*```$/i, '');
-    jsonStr = jsonStr.replace(/^```\s*/i, '').replace(/\s*```$/i, '');
-    jsonStr = jsonStr.replace(/<[^>]*>/g, '');
-    
-    // Try to find JSON object if it starts with {
-    const jsonStart = jsonStr.indexOf('{');
-    const jsonEnd = jsonStr.lastIndexOf('}');
-    
-    if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-      jsonStr = jsonStr.substring(jsonStart, jsonEnd + 1);
-    }
-
-    try {
-      return JSON.parse(jsonStr);
-    } catch (error) {
-      console.error(chalk.red('Failed to parse JSON response'));
-      console.error(chalk.gray('Raw response:'), jsonStr.substring(0, 200) + '...');
-      throw error;
-    }
-  }
 }

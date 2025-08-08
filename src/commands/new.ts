@@ -55,6 +55,17 @@ export async function runWorkflow(
 ): Promise<void> {
   const currentSession = session;
 
+  // Set up error handling to save progress
+  const saveProgressOnError = async (error: Error) => {
+    try {
+      await sessionManager.saveSession(currentSession);
+      ui.warningMsg('Session saved despite error. You can resume with: makeaplan resume');
+    } catch (saveError) {
+      ui.errorMsg('Failed to save session progress');
+    }
+    throw error;
+  };
+
   // Continue until workflow is complete
   let workflowComplete = false;
 
@@ -133,67 +144,82 @@ export async function runWorkflow(
       }
 
       case SessionStep.FINAL_WRITEUP: {
-        // Generate writeup
-        const allQuestions = currentSession.questionRounds.flatMap((round) =>
-          round.questions.map((q) => q.question)
-        );
-        const allAnswers = currentSession.questionRounds.flatMap((round) => round.answers);
+        try {
+          // Generate writeup
+          const allQuestions = currentSession.questionRounds.flatMap((round) =>
+            round.questions.map((q) => q.question)
+          );
+          const allAnswers = currentSession.questionRounds.flatMap((round) => round.answers);
 
-        currentSession.writeup = await aiClient.generateWriteup(
-          currentSession.idea,
-          allQuestions,
-          allAnswers
-        );
+          currentSession.writeup = await aiClient.generateWriteup(
+            currentSession.idea,
+            allQuestions,
+            allAnswers
+          );
 
-        currentSession.currentStep = SessionStep.GENERATE_FILE_STRUCTURE;
-        await sessionManager.saveSession(currentSession);
+          currentSession.currentStep = SessionStep.GENERATE_FILE_STRUCTURE;
+          await sessionManager.saveSession(currentSession);
 
-        ui.box(
-          [
-            'Technical specification generated!',
-            `Length: ${currentSession.writeup.length} characters`,
-            `Sections: ${(currentSession.writeup.match(/^#{1,3} /gm) || []).length}`,
-          ],
-          'Specification Complete'
-        );
+          // Auto-save specification as markdown
+          const exporter = new Exporter();
+          const specFile = await exporter.exportSpecificationOnly(currentSession, 'markdown');
+          
+          ui.box(
+            [
+              'Technical specification generated!',
+              `Length: ${currentSession.writeup.length} characters`,
+              `Sections: ${(currentSession.writeup.match(/^#{1,3} /gm) || []).length}`,
+              '',
+              `📄 Auto-saved: ${specFile}`,
+              '✓ Your specification is safe even if the next step fails!',
+            ],
+            'Specification Complete'
+          );
 
-        if (!(await confirmContinue('Generate file structure?'))) {
-          await exportAndExit(currentSession);
-          return;
+          if (!(await confirmContinue('Generate file structure?'))) {
+            await exportAndExit(currentSession);
+            return;
+          }
+        } catch (error) {
+          await saveProgressOnError(error as Error);
         }
         break;
       }
 
       case SessionStep.GENERATE_FILE_STRUCTURE: {
-        if (!currentSession.writeup) {
-          throw new Error('No writeup found');
-        }
+        try {
+          if (!currentSession.writeup) {
+            throw new Error('No writeup found');
+          }
 
-        currentSession.fileStructure = await aiClient.generateFileStructure(currentSession.writeup);
+          currentSession.fileStructure = await aiClient.generateFileStructure(currentSession.writeup);
 
-        ui.box(
-          [
-            'File structure generated!',
-            `Files/Dirs: ${(currentSession.fileStructure.match(/[│├└]/g) || []).length}`,
-          ],
-          'File Structure Complete'
-        );
-
-        if (!(await confirmContinue('Convert to JSON format?'))) {
+          // Save session after file structure generation
           await sessionManager.saveSession(currentSession);
-          await exportAndExit(currentSession);
-          return;
+
+          // Auto-save file structure 
+          const exporter = new Exporter();
+          const structureFile = await exporter.exportFileStructureOnly(currentSession, 'markdown');
+
+          ui.box(
+            [
+              'File structure generated!',
+              `Files/Dirs: ${(currentSession.fileStructure.match(/[│├└]/g) || []).length}`,
+              '',
+              `📄 Auto-saved: ${structureFile}`,
+              '✓ Your project structure is ready!',
+            ],
+            'File Structure Complete'
+          );
+
+          currentSession.currentStep = SessionStep.CONVERT_TO_JSON; // Mark as complete
+          await sessionManager.saveSession(currentSession);
+
+          ui.successMsg('Workflow complete! 🎉');
+          workflowComplete = true;
+        } catch (error) {
+          await saveProgressOnError(error as Error);
         }
-
-        // Convert to JSON
-        currentSession.fileStructureJson = await aiClient.convertToJson(
-          currentSession.fileStructure
-        );
-        currentSession.currentStep = SessionStep.CONVERT_TO_JSON;
-        await sessionManager.saveSession(currentSession);
-
-        ui.successMsg('Workflow complete! 🎉');
-        workflowComplete = true;
         break;
       }
     }

@@ -24,7 +24,6 @@ export interface Session {
   questionRounds: QuestionRound[];
   writeup?: string;
   fileStructure?: string;
-  fileStructureJson?: FileStructureItem;
   createdAt: Date;
   updatedAt: Date;
   config: SessionConfig;
@@ -45,7 +44,7 @@ export enum SessionStep {
   QUESTIONS_ROUND_3 = 'QUESTIONS_ROUND_3',
   FINAL_WRITEUP = 'FINAL_WRITEUP',
   GENERATE_FILE_STRUCTURE = 'GENERATE_FILE_STRUCTURE',
-  CONVERT_TO_JSON = 'CONVERT_TO_JSON',
+  CONVERT_TO_JSON = 'CONVERT_TO_JSON', // Keep for backward compatibility, but workflow ends at GENERATE_FILE_STRUCTURE
 }
 
 export interface Config {

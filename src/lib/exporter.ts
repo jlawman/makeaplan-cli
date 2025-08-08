@@ -30,6 +30,32 @@ export class Exporter {
     return exportedFiles;
   }
 
+  async exportSpecificationOnly(session: Session, format: 'markdown' | 'json'): Promise<string> {
+    const baseFileName = `${session.idea
+      .substring(0, 30)
+      .replace(/[^a-z0-9]/gi, '-')
+      .toLowerCase()}-${session.id}-spec`;
+
+    if (format === 'markdown') {
+      return await this.exportSpecificationMarkdown(session, baseFileName);
+    } else {
+      return await this.exportSpecificationJson(session, baseFileName);
+    }
+  }
+
+  async exportFileStructureOnly(session: Session, format: 'markdown' | 'json'): Promise<string> {
+    const baseFileName = `${session.idea
+      .substring(0, 30)
+      .replace(/[^a-z0-9]/gi, '-')
+      .toLowerCase()}-${session.id}-structure`;
+
+    if (format === 'markdown') {
+      return await this.exportFileStructureMarkdown(session, baseFileName);
+    } else {
+      return await this.exportFileStructureJson(session, baseFileName);
+    }
+  }
+
   private async exportMarkdown(session: Session, baseFileName: string): Promise<string> {
     const spinner = ora('Exporting markdown...').start();
 
@@ -65,7 +91,6 @@ export class Exporter {
         outputs: {
           writeup: session.writeup,
           fileStructure: session.fileStructure,
-          fileStructureJson: session.fileStructureJson,
         },
       };
 
@@ -137,5 +162,83 @@ export class Exporter {
     md += `- **Answers Per Question**: ${session.config.answersPerQuestion}\n`;
 
     return md;
+  }
+
+  private async exportSpecificationMarkdown(session: Session, baseFileName: string): Promise<string> {
+    if (!session.writeup) {
+      throw new Error('No specification found to export');
+    }
+
+    let content = `# ${session.idea} - Technical Specification\n\n`;
+    content += `> Generated on ${session.createdAt.toLocaleDateString()} using MakeAPlan CLI\n\n`;
+    content += `${session.writeup}\n\n`;
+    content += `---\n\n*Session ID: ${session.id}*\n`;
+
+    const filePath = join(this.getOutputDir(), `${baseFileName}.md`);
+    await fs.writeFile(filePath, content);
+    
+    return filePath;
+  }
+
+  private async exportSpecificationJson(session: Session, baseFileName: string): Promise<string> {
+    if (!session.writeup) {
+      throw new Error('No specification found to export');
+    }
+
+    const exportData = {
+      metadata: {
+        id: session.id,
+        createdAt: session.createdAt,
+        updatedAt: session.updatedAt,
+        type: 'specification',
+      },
+      idea: session.idea,
+      specification: session.writeup,
+    };
+
+    const filePath = join(this.getOutputDir(), `${baseFileName}.json`);
+    await fs.writeFile(filePath, JSON.stringify(exportData, null, 2));
+    
+    return filePath;
+  }
+
+  private async exportFileStructureMarkdown(session: Session, baseFileName: string): Promise<string> {
+    if (!session.fileStructure) {
+      throw new Error('No file structure found to export');
+    }
+
+    let content = `# ${session.idea} - File Structure\n\n`;
+    content += `> Generated on ${session.createdAt.toLocaleDateString()} using MakeAPlan CLI\n\n`;
+    content += '```\n';
+    content += `${session.fileStructure}\n`;
+    content += '```\n\n';
+    content += `---\n\n*Session ID: ${session.id}*\n`;
+
+    const filePath = join(this.getOutputDir(), `${baseFileName}.md`);
+    await fs.writeFile(filePath, content);
+    
+    return filePath;
+  }
+
+  private async exportFileStructureJson(session: Session, baseFileName: string): Promise<string> {
+    if (!session.fileStructure) {
+      throw new Error('No file structure found to export');
+    }
+
+    const exportData = {
+      metadata: {
+        id: session.id,
+        createdAt: session.createdAt,
+        updatedAt: session.updatedAt,
+        type: 'file-structure',
+      },
+      idea: session.idea,
+      fileStructure: session.fileStructure,
+    };
+
+    const filePath = join(this.getOutputDir(), `${baseFileName}.json`);
+    await fs.writeFile(filePath, JSON.stringify(exportData, null, 2));
+    
+    return filePath;
   }
 }
