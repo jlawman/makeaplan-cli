@@ -97,7 +97,7 @@ export class AIClient {
       // Using configurable Anthropic model
       const response = await this.anthropic.messages.create({
         model: this.getModelName('anthropic'),
-        max_tokens: 4096,
+        max_tokens: 8192,
         messages: [{ role: 'user', content: prompt }],
       });
 
