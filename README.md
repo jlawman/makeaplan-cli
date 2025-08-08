@@ -3,6 +3,7 @@
 Transform your product ideas into comprehensive technical specifications using AI-guided discovery.
 
 <p align="center">
+  <a href="https://www.npmjs.com/package/makeaplan"><img src="https://img.shields.io/npm/v/makeaplan.svg" alt="npm version"></a>
   <img src="https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen" alt="Node Version">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/TypeScript-5.6-blue" alt="TypeScript">
@@ -159,15 +160,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 MIT License - see LICENSE file for details.
 
-## 🙏 Acknowledgments
-
-Built with:
-- [Commander.js](https://github.com/tj/commander.js/) - CLI framework
-- [Inquirer.js](https://github.com/SBoudrias/Inquirer.js/) - Interactive prompts
-- [Chalk](https://github.com/chalk/chalk) - Terminal styling
-- [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-typescript) - Claude AI
-- [Google Generative AI](https://github.com/google/generative-ai-js) - Gemini AI
-
 ---
 
-<p align="center">Made with ❤️ by developers, for developers</p>
+<p align="center">Made with Claude Code for Claude Code</p>

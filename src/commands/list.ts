@@ -20,7 +20,7 @@ export async function listCommand() {
       const stepColor = getStepColor(session.step);
 
       return [
-        chalk.gray(session.id.substring(0, 8)),
+        chalk.gray(session.id),
         session.idea,
         stepColor(stepLabel),
         chalk.gray(formatDate(session.updatedAt)),

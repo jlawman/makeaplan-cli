@@ -102,15 +102,17 @@ export class AIClient {
 
   private async sendPrompt(prompt: string): Promise<string> {
     if (this.provider === 'anthropic' && this.anthropic) {
+      // Using Anthropic's Sonnet 4 model
       const response = await this.anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }],
       });
 
       return response.content[0].type === 'text' ? response.content[0].text : '';
     } else if (this.provider === 'gemini' && this.gemini) {
-      const model = this.gemini.getGenerativeModel({ model: 'gemini-pro' });
+      // Using Google's Gemini 2.5 Pro thinking model
+      const model = this.gemini.getGenerativeModel({ model: 'gemini-2.5-pro' });
       const result = await model.generateContent(prompt);
       const response = await result.response;
       return response.text();

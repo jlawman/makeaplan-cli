@@ -24,9 +24,9 @@ export async function askQuestions(questions: Question[], round: number): Promis
   for (let i = 0; i < questions.length; i++) {
     const question = questions[i];
 
-    // Add numbered choices
+    // Add numbered choices for list type
     const numberedChoices = question.choices.map((choice, index) => ({
-      name: `${index + 1}. ${choice}`,
+      name: `${index + 1}) ${choice}`,
       value: choice,
       short: choice,
     }));
@@ -34,18 +34,19 @@ export async function askQuestions(questions: Question[], round: number): Promis
     const choices: any[] = [
       ...numberedChoices,
       new inquirer.Separator(),
-      { name: '0. ✏️  Write your own answer', value: 'custom', short: 'Custom' },
-      { name: 's. ⏭️  Skip this question', value: 'skip', short: 'Skipped' },
+      { name: '0) ✏️  Write your own answer', value: 'custom', short: 'Custom' },
+      { name: 's) ⏭️  Skip this question', value: 'skip', short: 'Skipped' },
     ];
 
-    // Use rawlist type which supports number key navigation
+    // Use list type for better control
     const { answer } = await inquirer.prompt([
       {
-        type: 'rawlist',
+        type: 'list',
         name: 'answer',
         message: `${question.question}`,
         choices,
         pageSize: 12,
+        prefix: `${i + 1}/${questions.length}`,
       },
     ]);
 

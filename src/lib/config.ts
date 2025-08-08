@@ -8,7 +8,6 @@ import { join } from 'path';
 const defaultConfig: Config = {
   defaultProvider: 'anthropic',
   sessionsDir: join(homedir(), '.makeaplan', 'sessions'),
-  outputDir: process.cwd(),
 };
 
 export const config = new Conf<Config>({

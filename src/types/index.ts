@@ -54,5 +54,4 @@ export interface Config {
   defaultProvider: 'anthropic' | 'gemini';
   defaultModel?: string;
   sessionsDir: string;
-  outputDir: string;
 }

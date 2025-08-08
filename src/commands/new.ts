@@ -34,7 +34,7 @@ export async function newCommand(options: { idea?: string; skipQuestions?: boole
     const sessionManager = new SessionManager();
     const session = await sessionManager.createSession(idea, sessionConfig);
 
-    ui.successMsg(`Session created: ${chalk.gray(session.id.substring(0, 8))}`);
+    ui.successMsg(`Session created: ${chalk.gray(session.id)}`);
 
     // Initialize AI client
     const aiClient = new AIClient(sessionConfig.provider);
