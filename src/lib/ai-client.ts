@@ -16,9 +16,9 @@ export class AIClient {
 
   private getModelName(provider: 'anthropic' | 'gemini'): string {
     if (provider === 'anthropic') {
-      return process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
+      return process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514';
     } else {
-      return process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
+      return process.env.GEMINI_MODEL || 'gemini-2.5-pro';
     }
   }
 
