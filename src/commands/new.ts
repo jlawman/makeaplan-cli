@@ -171,7 +171,6 @@ export async function runWorkflow(
               `Sections: ${(currentSession.writeup.match(/^#{1,3} /gm) || []).length}`,
               '',
               `📄 Auto-saved: ${specFile}`,
-              '✓ Your specification is safe even if the next step fails!',
             ],
             'Specification Complete'
           );
@@ -207,7 +206,6 @@ export async function runWorkflow(
               `Files/Dirs: ${(currentSession.fileStructure.match(/[│├└]/g) || []).length}`,
               '',
               `📄 Auto-saved: ${structureFile}`,
-              '✓ Your project structure is ready!',
             ],
             'File Structure Complete'
           );
