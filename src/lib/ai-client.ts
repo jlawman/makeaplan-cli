@@ -14,6 +14,14 @@ export class AIClient {
     this.provider = provider;
   }
 
+  private getModelName(provider: 'anthropic' | 'gemini'): string {
+    if (provider === 'anthropic') {
+      return process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
+    } else {
+      return process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
+    }
+  }
+
   async initialize(): Promise<void> {
     const apiKey = await getApiKey(this.provider);
 
@@ -102,17 +110,17 @@ export class AIClient {
 
   private async sendPrompt(prompt: string): Promise<string> {
     if (this.provider === 'anthropic' && this.anthropic) {
-      // Using Anthropic's Sonnet 4 model
+      // Using configurable Anthropic model
       const response = await this.anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: this.getModelName('anthropic'),
         max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }],
       });
 
       return response.content[0].type === 'text' ? response.content[0].text : '';
     } else if (this.provider === 'gemini' && this.gemini) {
-      // Using Google's Gemini 2.5 Pro thinking model
-      const model = this.gemini.getGenerativeModel({ model: 'gemini-2.5-pro' });
+      // Using configurable Gemini model
+      const model = this.gemini.getGenerativeModel({ model: this.getModelName('gemini') });
       const result = await model.generateContent(prompt);
       const response = await result.response;
       return response.text();
@@ -259,12 +267,26 @@ Wrap the JSON in <json> tags.`;
 
   private extractJson(response: string): FileStructureItem {
     const match = response.match(/<json>([\s\S]*?)<\/json>/);
-    const jsonStr = match ? match[1].trim() : response;
+    let jsonStr = match ? match[1].trim() : response.trim();
+    
+    // Remove any potential HTML tags or markdown code blocks that might be left
+    jsonStr = jsonStr.replace(/^```json\s*/i, '').replace(/\s*```$/i, '');
+    jsonStr = jsonStr.replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+    jsonStr = jsonStr.replace(/<[^>]*>/g, '');
+    
+    // Try to find JSON object if it starts with {
+    const jsonStart = jsonStr.indexOf('{');
+    const jsonEnd = jsonStr.lastIndexOf('}');
+    
+    if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+      jsonStr = jsonStr.substring(jsonStart, jsonEnd + 1);
+    }
 
     try {
       return JSON.parse(jsonStr);
     } catch (error) {
       console.error(chalk.red('Failed to parse JSON response'));
+      console.error(chalk.gray('Raw response:'), jsonStr.substring(0, 200) + '...');
       throw error;
     }
   }
